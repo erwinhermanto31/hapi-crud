@@ -4,73 +4,60 @@ const R = require('ramda');
 const { Book } = require('./models');
 const Boom = require('boom');
 
-function index(request, reply) {
-  Book.findAll({
+async function index(request, reply) {
+  const books = await Book.findAll({
     attributes: ['id', 'title', 'author'],
-  }).then(function(books) {
-    reply({ books: books });
   });
+  reply({ books: books });
 }
 
-function show(request, reply) {
+async function show(request, reply) {
   const id = request.params.id;
-  Book.findById(id, { attributes: ['id', 'title', 'author'] }).then(function(
-    book
-  ) {
-    if (book) {
-      reply({ book: book });
-    } else {
-      reply(Boom.notFound(`Cannot find book ${id}`));
-    }
+  const book = await Book.findById(id, {
+    attributes: ['id', 'title', 'author'],
   });
+  if (book) {
+    reply({ book: book });
+  } else {
+    reply(Boom.notFound(`Cannot find book ${id}`));
+  }
 }
 
-function create(request, reply) {
+async function create(request, reply) {
   const attributes = {
     title: request.payload.book.title,
     author: request.payload.book.author,
   };
-  Book.create(attributes).then(function(book) {
-    if (book) {
-      reply({ book: book });
-    } else {
-      reply(Boom.badImplementation());
-    }
-  });
+  const book = await Book.create(attributes);
+  if (book) {
+    reply({ book: book });
+  } else {
+    reply(Boom.badImplementation());
+  }
 }
 
-function update(request, reply) {
-  let updatedBook;
-  Book.findById(request.params.id)
-    .then(function(book) {
-      if (!book) {
-        reply.status(404);
-        return;
-      }
+async function update(request, reply) {
+  const book = await Book.findById(request.params.id);
+  if (!book) {
+    reply.status(404);
+    return;
+  }
 
-      const attributes = R.pick(['title', 'author'], request.payload.book);
-      Object.assign(book, attributes);
-      updatedBook = book;
-      return book.save();
-    })
-    .then(function() {
-      reply({ book: updatedBook });
-    });
+  const attributes = R.pick(['title', 'author'], request.payload.book);
+  Object.assign(book, attributes);
+  await book.save();
+  reply({ book: book });
 }
 
-function destroy(request, reply) {
-  Book.findById(request.params.id)
-    .then(function(book) {
-      if (!book) {
-        reply.status(404);
-        return;
-      }
+async function destroy(request, reply) {
+  const book = await Book.findById(request.params.id);
+  if (!book) {
+    reply.status(404);
+    return;
+  }
 
-      return book.destroy();
-    })
-    .then(function() {
-      reply({});
-    });
+  await book.destroy();
+  reply({});
 }
 
 function addRoutes(server) {
