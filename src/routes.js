@@ -1,3 +1,5 @@
+'use strict';
+
 const R = require('ramda');
 const { Book } = require('./models');
 const Boom = require('boom');
