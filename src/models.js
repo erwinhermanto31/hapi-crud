@@ -3,38 +3,17 @@
 const config = require('config');
 const Sequelize = require('sequelize');
 
-const databaseUrl = config.databaseUrl;
+const databaseUrl = "postgres://erwinhermanto:@localhost:5432/data_barang";
 const sequelize = new Sequelize(databaseUrl, {
   underscoredAll: true,
 });
-
-const Book = sequelize.define(
-  'books',
-  {
-    title: {
-      type: Sequelize.STRING,
-    },
-
-    author: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    freezeTableName: true,
-  }
-);
-
-function resetDatabase() {
-  return Book.truncate();
-}
-
-function syncDatabase() {
-  return Book.sync({ force: true });
-}
+const Barang = sequelize.define('tbl_barang',{
+    nama_barang: Sequelize.STRING,
+    deskripsi: Sequelize.TEXT,
+    harga_barang: Sequelize.INTEGER,
+    gambar: Sequelize.STRING,
+});
 
 module.exports = {
-  resetDatabase,
-  syncDatabase,
-  Book,
+  Barang,
 };

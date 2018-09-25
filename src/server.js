@@ -1,10 +1,11 @@
 'use strict';
 
 const Hapi = require('hapi');
+const Inert = require('inert');
 const Good = require('Good');
 const config = require('config');
 
-const { Book } = require('./models');
+const { Barang } = require('./models');
 const { addRoutes } = require('./routes');
 
 process.on('unhandledRejection', (error, promise) => {
@@ -16,7 +17,7 @@ process.on('unhandledRejection', (error, promise) => {
 
 const server = new Hapi.Server();
 const port = config.port;
-server.connection({ port: port });
+server.connection({ "host": "localhost","port":"8080" ,routes: {cors: {origin: ['http://localhost:8080/barangs']} }});
 server.register(
   {
     register: Good,
